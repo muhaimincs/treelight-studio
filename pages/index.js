@@ -1,6 +1,22 @@
 import Head from 'next/head'
+import Image from 'next/image'
 
-export default function Home() {
+export async function getStaticProps({ preview = false }) {
+  let Parser = require('rss-parser');
+  let parser = new Parser();
+  let feed = await parser.parseURL('https://treelightasia.wordpress.com/feed/');
+  let cats = feed.items.reduce((acc, item) => {
+    const { categories } = item;
+    acc = [ ...acc, ...categories ];
+    return acc 
+  }, []);
+  return {
+    props: { data: feed.items, cats, preview },
+  }
+}
+
+export default function Home({ data, cats }) {
+  console.log(cats)
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
       <Head>
@@ -8,7 +24,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <header className="flex justify-center items-center">
-
+        <Image src="https://cdn.statically.io/gh/muhaimincs/treelight-studio/main/logo-treelight.png" width={250} height={98} />
       </header>
       <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
         <h1 className="text-6xl font-bold">
