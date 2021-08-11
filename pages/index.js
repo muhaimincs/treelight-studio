@@ -10,28 +10,38 @@ export async function getStaticProps({ preview = false }) {
     return acc 
   }, []);
   return {
-    props: { data: feed.items, cats, preview },
+    props: { data: feed.items, cats: [ ...new Set(cats) ], preview },
   }
 }
 
 export default function Home({ data, cats }) {
-  console.log(cats)
+  const first = data[0];
+  const div = document.createElement('div');
+  div.innerHTML = first['content:encoded'];
+  const firstImage = div.getElementsByTagName('img')[0];
+  var imgSrc = firstImage ? firstImage.src : "";
+  console.log(imgSrc)
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
       <Head>
         <title>Treelight Studio</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <header className="flex justify-center items-center">
+      <header className="flex justify-center items-center flex-col">
         <img src="https://cdn.statically.io/gh/muhaimincs/treelight-studio/main/logo-treelight.png" width="250px" height="98px" />
       </header>
+      <div className="w-full">
+        <div className="border-t border-b flex justify-center my-6">
+          <ul className="divide-x flex space-x-6">
+            {cats.map((cat) => {
+              return (
+                <li key={cat} className="first:pl-0 pl-3 text-center">{cat}</li>
+              )
+            })}
+          </ul>
+        </div>
+      </div>
       <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
-        <h1 className="text-6xl font-bold">
-          Welcome to{' '}
-          <a className="text-blue-600" href="https://nextjs.org">
-            Next.js!
-          </a>
-        </h1>
 
         <p className="mt-3 text-2xl">
           Get started by editing{' '}
@@ -84,15 +94,7 @@ export default function Home({ data, cats }) {
       </main>
 
       <footer className="flex items-center justify-center w-full h-24 border-t">
-        <a
-          className="flex items-center justify-center"
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className="h-4 ml-2" />
-        </a>
+        Hidup adalah belajar
       </footer>
     </div>
   )
