@@ -1,5 +1,4 @@
 import Head from 'next/head'
-import Image from 'next/image'
 
 export async function getStaticProps({ preview = false }) {
   let Parser = require('rss-parser');
@@ -24,7 +23,7 @@ export default function Home({ data, cats }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <header className="flex justify-center items-center">
-        <Image src="https://cdn.statically.io/gh/muhaimincs/treelight-studio/main/logo-treelight.png" width={250} height={98} />
+        <img src="https://cdn.statically.io/gh/muhaimincs/treelight-studio/main/logo-treelight.png" width="250px" height="98px" />
       </header>
       <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
         <h1 className="text-6xl font-bold">
