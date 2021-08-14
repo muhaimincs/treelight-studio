@@ -1,26 +1,64 @@
+import { useEffect, Fragment, useMemo } from 'react'
 import Head from 'next/head'
+
+import { getAllPostsForHome, getSiteInfo } from '../lib/api'
 
 export async function getStaticProps({ preview = false }) {
   let Parser = require('rss-parser');
   let parser = new Parser();
-  let feed = await parser.parseURL('https://treelightasia.wordpress.com/feed/');
+  let feed = await parser.parseURL('https://treelightasia.com/index.php/feed/');
   let cats = feed.items.reduce((acc, item) => {
     const { categories } = item;
     acc = [ ...acc, ...categories ];
     return acc 
   }, []);
+  // const jsdom = require("jsdom");
+  // const { JSDOM } = jsdom;
+  // const first = feed.items[0];
+  // const dom = new JSDOM(first['content:encoded']);
+  // const firstImage = dom.window.document.getElementsByTagName('img')[0];
+  // const imgSrc = firstImage ? firstImage.src : "";
+  // return {
+  //   props: { data: feed.items, cats: [ ...new Set(cats) ], imgSrc, preview },
+  // }
+  const allPosts = await getAllPostsForHome(preview)
+  const siteInfo = await getSiteInfo(preview)
   return {
-    props: { data: feed.items, cats: [ ...new Set(cats) ], preview },
+    props: { data: allPosts, cats: [ ...new Set(cats) ], preview, siteInfo },
   }
 }
 
-export default function Home({ data, cats }) {
-  const first = data[0];
-  const div = document.createElement('div');
-  div.innerHTML = first['content:encoded'];
-  const firstImage = div.getElementsByTagName('img')[0];
-  var imgSrc = firstImage ? firstImage.src : "";
-  console.log(imgSrc)
+export default function Home({ data, cats, imgSrc, siteInfo }) {
+  // console.log(siteInfo)
+  const renderData = useMemo(() => {
+    if (!data) {
+      return null;
+    }
+    return data.map((d,i) => {
+      return (
+        <div className={`border overflow-hidden ${i === 0 ? 'col-span-3 row-span-2 md:col-span-2':''} grid grid-cols-1`} key={d.id}>
+          <div className={`relative z-10 px-4 pt-10 pb-3 bg-gradient-to-t from-black`}>
+            <p className="text-sm font-medium text-white">{d.date}</p>
+            <h2 class="text-xl font-semibold text-white sm:text-2xl sm:leading-7 md:text-3xl">{d.title.rendered}</h2>
+          </div>
+          {d.excerpt.rendered && (
+            <div className="col-start-1 row-start-2 px-4">
+              <div className="flex items-center text-sm font-medium my-5 sm:mt-2 sm:mb-4 prose">
+                <div>{d.excerpt.rendered}</div>
+              </div>
+            </div>
+          )}
+          <div className="col-start-1 row-start-1 flex">
+            <div class={`w-full ${i === 0 ? 'h-screen max-h-80':''} grid grid-cols-3 grid-rows-2 gap-2`}>
+              <div className="relative col-span-3 row-span-2 col-span-2">
+                <img className="absolute inset-0 w-full h-full object-cover bg-gray-100 sm:rounded-t" src={d.jetpack_featured_media_url} alt={d.title.rendered} loading="lazy" />
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    })
+  }, [data]);
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
       <Head>
@@ -35,61 +73,15 @@ export default function Home({ data, cats }) {
           <ul className="divide-x flex space-x-6">
             {cats.map((cat) => {
               return (
-                <li key={cat} className="first:pl-0 pl-3 text-center">{cat}</li>
+                <li key={cat} className="first:pl-0 pl-6 text-center">{cat}</li>
               )
             })}
           </ul>
         </div>
       </div>
       <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
-
-        <p className="mt-3 text-2xl">
-          Get started by editing{' '}
-          <code className="p-3 font-mono text-lg bg-gray-100 rounded-md">
-            pages/index.js
-          </code>
-        </p>
-
-        <div className="flex flex-wrap items-center justify-around max-w-4xl mt-6 sm:w-full">
-          <a
-            href="https://nextjs.org/docs"
-            className="p-6 mt-6 text-left border w-96 rounded-xl hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Documentation &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Find in-depth information about Next.js features and API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn"
-            className="p-6 mt-6 text-left border w-96 rounded-xl hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Learn &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Learn about Next.js in an interactive course with quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className="p-6 mt-6 text-left border w-96 rounded-xl hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Examples &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Discover and deploy boilerplate example Next.js projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className="p-6 mt-6 text-left border w-96 rounded-xl hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Deploy &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+        <div className="grid grid-cols-3 grid-rows-2 gap-2">
+          {renderData}
         </div>
       </main>
 
