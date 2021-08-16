@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@tailwindcss/typography": "^0.4.1",
+    "date-fns": "^2.23.0",
     "jsdom": "^16.7.0",
     "next": "latest",
     "react": "^17.0.2",
