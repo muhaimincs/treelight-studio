@@ -26,11 +26,20 @@ export async function getStaticProps({ preview = false }) {
   const siteInfo = await getSiteInfo(preview)
   return {
     props: { data: allPosts, cats: [ ...new Set(cats) ], preview, siteInfo },
+    revalidate: 60
   }
 }
 
 export default function Home({ data, cats, imgSrc, siteInfo }) {
   // console.log(siteInfo)
+  const articlePublishedTime = useMemo(() => {
+    return new Date(data[0].date);
+  }, [data]);
+  const articleModifiedTime = useMemo(() => {
+    return data[0].modified_gmt
+    // return new Date(data[0].date);
+  }, [data]);
+  console.log(articleModifiedTime)
   const renderData = useMemo(() => {
     if (!data) {
       return null;
@@ -118,6 +127,27 @@ export default function Home({ data, cats, imgSrc, siteInfo }) {
       <Head>
         <title>Treelight Studio</title>
         <link rel="icon" href="/favicon.ico" />
+        <meta property="og:title" content="Tree Light Studio"/>
+        <meta property="og:type" content="website"/>
+        <meta property="og:description" content="Mendengar | Melihat | Memberitahu"/>
+        <meta property="og:url" content="https://treelight.studio/"/>
+        <meta property="og:site_name" content="Tree Light Studio"/>
+        <meta property="og:image" content="/img/teaser.jpg" />
+        <meta name="description" content="sebagai badan NGO yang memfokuskan kepada pembaharuan pemikiran Islam dan metadologinya untuk membolehkan Ummah menangani secara berkesan untuk menyampaikan cabaran dan menyumbang kepada kemajuan peradaban manusia"/>
+		    <link rel="canonical" href="https://treelight.studio/" />
+		    <meta property="og:site_name" content="Tree Light Studio - Mendengar | Melihat | Memberitahu" />
+		    <meta property="og:type" content="article" />
+		    <meta property="og:title" content="Tree Light Studio - Mendengar | Melihat | Memberitahu" />
+		    <meta property="og:description" content="sebagai badan NGO yang memfokuskan kepada pembaharuan pemikiran Islam dan metadologinya untuk membolehkan Ummah menangani secara berkesan untuk menyampaikan cabaran dan menyumbang kepada kemajuan peradaban manusia" />
+		    <meta property="og:url" content="https://treelight.studio/" />
+
+		    <meta property="article:published_time" content={articlePublishedTime} />
+		    <meta property="article:modified_time" content={articleModifiedTime} />
+
+		    <meta name="twitter:card" content="summary" />
+		    <meta name="twitter:domain" content="treelight.studio" />
+		    <meta name="twitter:title" content="Tree Light Studio - Mendengar | Melihat | Memberitahu" />
+		    <meta name="twitter:description" content="sebagai badan NGO yang memfokuskan kepada pembaharuan pemikiran Islam dan metadologinya untuk membolehkan Ummah menangani secara berkesan untuk menyampaikan cabaran dan menyumbang kepada kemajuan peradaban manusia" />
       </Head>
       <header className="flex justify-center items-center flex-col">
         <img src="https://cdn.statically.io/gh/muhaimincs/treelight-studio/main/logo-treelight.png" width="250px" height="98px" />
